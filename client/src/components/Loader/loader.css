@@ -1,0 +1,52 @@
+/* src/components/Loader.css */
+.loader {
+  position: fixed;          /* Make the loader fixed to the screen */
+  top: 0;                   /* Position it at the top of the screen */
+  left: 0;                  /* Position it at the left of the screen */
+  width: 100vw;             /* Full width of the viewport */
+  height: 100vh;            /* Full height of the viewport */
+  display: flex;            /* Flexbox for centering */
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
+  background-color: rgba(255, 255, 255, 0.8); /* Optional: semi-transparent background */
+  z-index: 9999;            /* Ensure it's above other content */
+}
+
+.loader span {
+  width: 15px;
+  height: 15px;
+  background-color: #4285F4;
+  border-radius: 50%;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+
+.loader span:nth-child(2) {
+  background-color: #EA4335;
+  animation-delay: 0.2s;
+}
+
+.loader span:nth-child(3) {
+  background-color: #FBBC05;
+  animation-delay: 0.4s;
+}
+
+.loader span:nth-child(4) {
+  background-color: #34A853;
+  animation-delay: 0.6s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+.text {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #000;
+}
