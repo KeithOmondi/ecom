@@ -31,7 +31,7 @@ const Header = () => {
                 Buy/Rent
               </a>
               <div className="absolute left-0 hidden mt-2 space-y-2 bg-blue-700 group-hover:block p-4 w-auto rounded-lg">
-                <a href="#buy" className="block absolute text-white hover:text-gray-300">
+                <a href="#buy" className="block text-white hover:text-gray-300">
                   For Sale
                 </a>
                 <a href="#rent" className="block text-white hover:text-gray-300">
