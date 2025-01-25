@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import {server} from "../../../server" 
@@ -38,10 +38,12 @@ const Signup = () => {
       className="h-screen bg-cover bg-center flex items-center justify-center"
       style={{
         backgroundImage:
-          "url(https://images.pexels.com/photos/1080696/pexels-photo-1080696.jpeg?auto=compress&cs=tinysrgb&w=600)",
+          "url(https://t3.ftcdn.net/jpg/02/73/11/96/360_F_273119624_DpYqxwJia1SuX06o3oo2ggIu3oCvKC7O.jpg)",
       }}
+      
     >
-      <div className="bg-white shadow-lg rounded-lg max-w-md w-full p-6 sm:p-8">
+       <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+       <div className="relative bg-white shadow-lg rounded-lg max-w-sm w-full p-8">
         <h2 className="text-2xl font-bold text-gray-800 text-center">
           Create Your Account
         </h2>
