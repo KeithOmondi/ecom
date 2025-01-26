@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import Signup from '../components/Signup/Signup'
+import { useEffect } from 'react'
+import Signup from '../../components/Signup/Signup'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -11,7 +11,7 @@ useEffect(() =>{
     if(isAuthenticated === true){
         navigate("/")
     }
-}, [])
+}, [isAuthenticated, navigate])
 
 
   return (

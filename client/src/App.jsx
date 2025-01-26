@@ -1,12 +1,15 @@
 // src/App.js
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import LoginPage from "./pages/Login";
-import SignupPage from "./pages/Signup";
+import LoginPage from "./pages/auth/Login";
+import SignupPage from "./pages/auth/Signup";
 import { ToastContainer } from "react-toastify";
-import ActivationPage from "./pages/ActivationPage";
+import ActivationPage from "./pages/auth/ActivationPage";
 import Loader from "./components/Loader/Loader";
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/dashboard/HomePage";
+import ResetPassword from "./pages/auth/ResetPassword";
+import ForgotPassword from "./pages/auth/ForgotPasswordPage";
+import OtpPage from "./pages/auth/otp";
 //import Loader from "./components/Loader";
 
 function App() {
@@ -30,6 +33,9 @@ function App() {
             path="/activation/:activation_token"
             element={<ActivationPage />}
           />
+          <Route path="/login/otp" element={<  OtpPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
       )}
 
