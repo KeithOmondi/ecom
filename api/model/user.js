@@ -16,15 +16,14 @@ const userSchema = new mongoose.Schema({
       "Please enter a valid email address",
     ],
   },
-  
   password: {
     type: String,
     required: [true, "Please enter your password"],
     select: false,
   },
   roles: {
-    type: String,
-    default: "user",
+    type: [String], // Allow multiple roles
+    default: ["user"],
   },
   activationCode: {
     type: String,
@@ -39,30 +38,27 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
   resetPasswordToken: String,
-  resetPasswordTime: Date,
+  resetPasswordExpires: Date, // Ensure consistency in forgot password logic
 });
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
 // Generate JWT Token
 userSchema.methods.getJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRES,
+    expiresIn: process.env.JWT_EXPIRES || "7d", // Ensure default expiration
   });
 };
 
 // Compare entered password with hashed password
 userSchema.methods.comparePasswords = async function (enteredPassword) {
-  try {
-    return await bcrypt.compare(enteredPassword, this.password);
-  } catch (error) {
-    throw new Error("Error comparing passwords");
-  }
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
 module.exports = mongoose.model("User", userSchema);

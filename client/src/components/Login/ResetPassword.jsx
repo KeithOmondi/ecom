@@ -1,7 +1,8 @@
-import { useState} from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { server } from "../../../server";
 
 const ResetPassword = () => {
   const { token } = useParams(); // Get the token from the URL
@@ -9,16 +10,10 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
-//   useEffect(() => {
-//     if (!token) {
-//       toast.error("Invalid or expired token.");
-//       navigate("/forgot-password"); // Redirect to ForgotPassword page if token is invalid
-//     }
-//   }, [token, navigate]);
-
   const handleResetPassword = async (e) => {
     e.preventDefault();
 
+    // Basic validation
     if (!password || !confirmPassword) {
       return toast.error("Please fill in both password fields.");
     }
@@ -28,42 +23,33 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await axios.post(`/user/reset-password`, { token, password });
+      // Send the token and password to the backend
+      const response = await axios.post(`${server}/user/reset-password`, { token, password });
+
       if (response.status === 200) {
         toast.success("Password has been reset successfully.");
-        navigate("/login"); // Redirect to login page after successful reset
+        navigate("/login"); // Redirect to login after successful password reset
       }
     } catch (error) {
+      // Handle errors
       toast.error(error.response?.data?.message || "An error occurred.");
     }
   };
 
   return (
-    <div
-      className="h-screen bg-cover bg-center flex items-center justify-center relative"
-      style={{
-        backgroundImage:
-          "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrHa8IWz8nxhFsqcAweGPU2h7XoyxhGnOXOGO-RzlEP2QeyunZpThhi77SAmRKQVhxzpI&usqp=CAU)",
-      }}
-    >
-      {/* Blur Overlay */}
+    <div className="h-screen bg-cover bg-center flex items-center justify-center relative"
+         style={{ backgroundImage: "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrHa8IWz8nxhFsqcAweGPU2h7XoyxhGnOXOGO-RzlEP2QeyunZpThhi77SAmRKQVhxzpI&usqp=CAU)" }}>
       <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
 
-      {/* Reset Password Box */}
       <div className="relative bg-white shadow-lg rounded-lg max-w-sm w-full p-8">
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">Reset Password</h2>
-        <p className="text-sm text-gray-500 text-center mb-6">
-          Enter your new password.
-        </p>
+        <p className="text-sm text-gray-500 text-center mb-6">Enter your new password.</p>
         <form onSubmit={handleResetPassword}>
           <div className="mb-4">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              New Password
-            </label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">New Password</label>
             <input
               type="password"
               id="password"
-              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -72,13 +58,10 @@ const ResetPassword = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </label>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
             <input
               type="password"
               id="confirmPassword"
-              name="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
