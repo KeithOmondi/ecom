@@ -6,9 +6,22 @@ import PartnersSection from "../../components/Layout/PartnersSection";
 import CEOMessage from "../../components/Layout/CEOMessage";
 import Listings from "../../components/Layout/Listings";
 import Footer from "../../components/Layout/Footer";
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
 
 
 const HomePage = () => {
+  const navigate = useNavigate()
+  const { isAuthenticated } = useSelector((state) => state.user)
+
+  useEffect(() => {
+    if (isAuthenticated === true) {
+      navigate("/home")
+    } else {
+      navigate("/login")
+    }
+  }, [isAuthenticated, navigate])
 
   return (
     <div className="bg-white">

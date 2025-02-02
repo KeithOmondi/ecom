@@ -4,19 +4,21 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 const SignupPage = () => {
-const navigate = useNavigate()
-const { isAuthenticated } = useSelector((state) => state.user)
+  const navigate = useNavigate()
+  const { isAuthenticated } = useSelector((state) => state.user)
 
-useEffect(() =>{
-    if(isAuthenticated === true){
-        navigate("/")
+  useEffect(() => {
+    if (isAuthenticated === true) {
+      navigate("/home")
+    } else {
+      navigate("/signup")
     }
-}, [isAuthenticated, navigate])
+  }, [isAuthenticated, navigate])
 
 
   return (
     <div>
-        <Signup />
+      <Signup />
     </div>
   )
 }
