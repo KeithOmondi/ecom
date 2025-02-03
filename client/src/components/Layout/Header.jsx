@@ -1,14 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Logo from "../../assets/logo.jpg";
 import { FaPlus, FaSearch, FaShoppingCart, FaPhoneAlt } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Logo from "../../assets/logo.jpg";
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("Home");
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Retrieve username from session storage
+    const storedUser = sessionStorage.getItem("user");
+    console.log("storedUser", storedUser);
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUsername(parsedUser.name || "");
+    }
+  }, []);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("token"); // Clear session storage
+    sessionStorage.removeItem("user"); // Clear session storage
+    setUsername(""); // Reset state
+    toast.success("Logged out successfully!"); // Show toast notification
+    navigate("/login"); // Redirect to login page
+  };
 
   return (
     <div className="bg-gray-50 sticky top-0 z-50 backdrop-blur-lg bg-opacity-60">
@@ -82,28 +104,41 @@ const Header = () => {
               <FaPhoneAlt /> +123-456-7890
             </button>
 
-            <div className="relative">
-              <button
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 text-sm bg-gray-100 hover:bg-blue-950 hover:text-white px-4 py-2 rounded-full"
-              >
-                Kelvin Njuiri <IoIosArrowDown />
-              </button>
-              {userDropdownOpen && (
-                <div className="absolute mt-2 w-40 bg-gray-100 hover:bg-blue-950 hover:text-white shadow-lg rounded-lg">
-                  <ul className="py-2">
-                    {["Profile", "Settings", "Logout"].map((option, idx) => (
-                      <li
-                        key={idx}
-                        className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
-                      >
-                        {option}
+            {username ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="flex items-center gap-2 text-sm bg-gray-100 hover:bg-blue-950 hover:text-white px-4 py-2 rounded-full"
+                >
+                  {username} <IoIosArrowDown />
+                </button>
+                {userDropdownOpen && (
+                  <div className="absolute mt-2 w-40 bg-gray-100 shadow-lg rounded-lg">
+                    <ul className="py-2">
+                      <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">
+                        Profile
                       </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+                      <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">
+                        Settings
+                      </li>
+                      <li
+                        className="px-4 py-2 hover:bg-red-100 text-red-600 cursor-pointer"
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="px-4 py-2 bg-blue-950 text-white rounded-full text-sm hover:bg-blue-800"
+              >
+                Login
+              </Link>
+            )}
 
             <motion.button
               className="px-4 py-2 bg-gray-500 text-sm text-white hover:bg-blue-950 rounded-lg"
