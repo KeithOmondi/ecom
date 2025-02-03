@@ -16,7 +16,7 @@ const HomePage = () => {
   const { isAuthenticated } = useSelector((state) => state.user)
 
   useEffect(() => {
-    if (isAuthenticated === true) {
+    if (isAuthenticated === false) {
       navigate("/home")
     } else {
       navigate("/login")
