@@ -21,7 +21,8 @@ const ResetPassword = () => {
     if (password !== confirmPassword) {
       return toast.error("Passwords do not match.");
     }
-
+    console.log('password', password)
+    console.log('token', token)
     try {
       // Send the token and password to the backend
       const response = await axios.post(`${server}/user/reset-password`, { token, password });
@@ -38,7 +39,7 @@ const ResetPassword = () => {
 
   return (
     <div className="h-screen bg-cover bg-center flex items-center justify-center relative"
-         style={{ backgroundImage: "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrHa8IWz8nxhFsqcAweGPU2h7XoyxhGnOXOGO-RzlEP2QeyunZpThhi77SAmRKQVhxzpI&usqp=CAU)" }}>
+      style={{ backgroundImage: "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrHa8IWz8nxhFsqcAweGPU2h7XoyxhGnOXOGO-RzlEP2QeyunZpThhi77SAmRKQVhxzpI&usqp=CAU)" }}>
       <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
 
       <div className="relative bg-white shadow-lg rounded-lg max-w-sm w-full p-8">
