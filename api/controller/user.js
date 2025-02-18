@@ -216,5 +216,82 @@ router.post('/reset-password', async (req, res) => {
 });
 
 
+// Default Admin Credentials (Change in .env)
+const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com";
+const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "Admin@123";
+
+// 1️⃣ Create Default Admin if not exists
+const createAdmin = async () => {
+  try {
+    const adminExists = await User.findOne({ email: DEFAULT_ADMIN_EMAIL });
+    if (!adminExists) {
+      const hashedPassword = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10);
+      await User.create({
+        name: "Administrator",
+        email: DEFAULT_ADMIN_EMAIL,
+        password: hashedPassword,
+        roles: ["admin"],
+        isActivated: true,
+      });
+      console.log("✅ Default Admin Created");
+    }
+  } catch (error) {
+    console.error("❌ Error creating admin:", error.message);
+  }
+};
+createAdmin(); // Run on server start
+
+// 2️⃣ Admin Login Route
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const admin = await User.findOne({ email }).select("+password");
+
+    if (!admin || !admin.roles.includes("admin")) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ id: admin._id, roles: admin.roles }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("token", token, { httpOnly: true }).status(200).json({ message: "Admin Logged In", token });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+});
+
+router.get("/admin-dashboard", isAuthenticated, isAdmin, (req, res) => {
+  res.status(200).json({ message: "Welcome Admin!" });
+});
+
+
+// 3️⃣ Change Admin Password (Protected)
+router.put("/change-password", isAuthenticated, isAdmin("admin"), async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const admin = await User.findById(req.user.id).select("+password");
+
+    if (!admin) return res.status(404).json({ message: "Admin not found" });
+
+    const isMatch = await bcrypt.compare(oldPassword, admin.password);
+    if (!isMatch) return res.status(400).json({ message: "Incorrect old password" });
+
+    admin.password = await bcrypt.hash(newPassword, 10);
+    await admin.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+});
+
+
+
 
 module.exports = router;

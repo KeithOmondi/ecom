@@ -1,5 +1,6 @@
 const app = require("./app");
 const connectDatabase = require("./db/Database");
+const cloudinary = require("cloudinary")
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
@@ -23,6 +24,12 @@ connectDatabase();
 
 app.get("/", (req, res) => {
     res.send("Hello world");
+});
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
 });
 
 const PORT = process.env.PORT || 3000;
