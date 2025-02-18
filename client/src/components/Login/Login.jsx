@@ -9,38 +9,56 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(false);
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!email || !password) {
       return toast.error("Please provide both email and password");
     }
-
-    await axios
-      .post(`${server}/user/login-user`, { email, password }, { withCredentials: true })
-      .then((response) => {
-        console.log("response", response);
-        if (response.status === 200 && response.data.success) {
-          const { token, user } = response.data;
-
-          // Store token and user info in session storage
-          sessionStorage.setItem("token", token);
-          sessionStorage.setItem("user", JSON.stringify(user));
-
-          toast.success("Login Successful");
-          navigate("/home");
-        } else {
-          toast.error("Unexpected response status: " + response.status);
+  
+    try {
+      const response = await axios.post(
+        `${server}/user/login-user`,
+        { email, password },
+        { withCredentials: true }
+      );
+  
+      if (response.status === 200 && response.data.success) {
+        const { token, user } = response.data;
+  
+        // Store token and user info
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("user", JSON.stringify(user));
+  
+        toast.success("Login Successful");
+  
+        // Role-based redirection
+        switch (user.role) {
+          case "admin":
+            navigate("/admin-dashboard");
+            break;
+          case "agent":
+            navigate("/agent-dashboard");
+            break;
+          case "user":
+            navigate("/user-dashboard");
+            break;
+          default:
+            navigate("/home"); // Fallback if role is undefined
+            break;
         }
-      })
-      .catch((error) => {
-        const message = error.response?.data?.message || "An error occurred";
-        toast.error(message);
-      });
+      } else {
+        toast.error("Unexpected response status: " + response.status);
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || "An error occurred";
+      toast.error(message);
+    }
   };
+  
 
 
 

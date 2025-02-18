@@ -23,6 +23,7 @@ const Header = () => {
       setUsername(parsedUser.name || "");
     }
   }, []);
+
   const handleRentSelection = (path, category) => {
     navigate(`${path}?category=${encodeURIComponent(category)}`);
     setRentDropdownOpen(false);
@@ -35,6 +36,7 @@ const Header = () => {
     toast.success("Logged out successfully!");
     navigate("/login");
   };
+
   useEffect(() => {
     const pathToName = {
       "/home": "Home",
@@ -49,19 +51,22 @@ const Header = () => {
     setActiveLink(pathToName[matchedPath] || "");
   }, [location.pathname]);
 
-
   return (
     <div className="bg-gray-50 sticky top-0 z-50 backdrop-blur-lg bg-opacity-60">
       <div className="shadow-md sticky top-0 z-50">
         <div className="mx-auto flex justify-between items-center px-6 py-3">
           <img src={Logo} alt="Logo" className="w-10 h-10" />
 
+          {/* Navigation */}
           <nav className="flex items-center gap-6 text-sm">
             <motion.div>
               <Link
                 to="/home"
-                className={`${activeLink === "Home" ? "border-b-2 border-blue-950 font-bold text-base" : "text-blue-950"
-                  } transition hover:border-b-2 hover:border-blue-950 hover:font-bold hover:text-base`}
+                className={`${
+                  activeLink === "Home"
+                    ? "border-b-2 border-blue-950 font-bold text-base"
+                    : "text-blue-950"
+                } transition hover:border-b-2 hover:border-blue-950 hover:font-bold hover:text-base`}
               >
                 Home
               </Link>
@@ -70,11 +75,12 @@ const Header = () => {
             {/* Rent Dropdown */}
             <div className="relative">
               <button
-
                 onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
-                className={`${activeLink === "Rent" ? "border-b-2 border-blue-950 flex items-center gap-1 font-bold text-base" : "text-blue-950"
-                  } transition hover:border-b-2 hover:border-blue-950 hover:font-bold hover:text-base flex items-center gap-1 `}
-
+                className={`${
+                  activeLink === "Rent"
+                    ? "border-b-2 border-blue-950 flex items-center gap-1 font-bold text-base"
+                    : "text-blue-950"
+                } transition hover:border-b-2 hover:border-blue-950 hover:font-bold hover:text-base flex items-center gap-1`}
               >
                 Rent <IoIosArrowDown />
               </button>
@@ -82,21 +88,20 @@ const Header = () => {
                 <div className="absolute mt-2 w-48 bg-white text-blue-950 shadow-lg rounded-lg">
                   <ul className="py-2">
                     {[
-                      { name: "Rent Warehouse", path: "/rent", category: "Warehouses" },
-                      { name: "Real Estate", path: "/rent", category: "Real Estate" },
-                      { name: "Event Spaces", path: "/rent", category: "Event Spaces" },
-                      { name: "Office Spaces", path: "/rent", category: "Office Spaces" },
-                    ].map((option, idx) => (
+                      "Warehouses",
+                      "Real Estate",
+                      "Event Spaces",
+                      "Office Spaces",
+                    ].map((category, idx) => (
                       <li
                         key={idx}
-                        onClick={() => handleRentSelection(option.path, option.category)}
+                        onClick={() => handleRentSelection("/rent", category)}
                         className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
                       >
-                        {option.name}
+                        Rent {category}
                       </li>
                     ))}
                   </ul>
-
                 </div>
               )}
             </div>
@@ -104,8 +109,11 @@ const Header = () => {
             <motion.div>
               <Link
                 to="/events"
-                className={`${activeLink === "Events" ? "border-b-2 border-blue-950 font-bold text-base" : "text-blue-950"
-                  } transition hover:border-b-2 hover:border-blue-950 hover:font-bold hover:text-base`}
+                className={`${
+                  activeLink === "Events"
+                    ? "border-b-2 border-blue-950 font-bold text-base"
+                    : "text-blue-950"
+                } transition hover:border-b-2 hover:border-blue-950 hover:font-bold hover:text-base`}
               >
                 Blogs & Events
               </Link>
@@ -114,8 +122,11 @@ const Header = () => {
             <motion.div>
               <Link
                 to="/services"
-                className={`${activeLink === "Services" ? "border-b-2 border-blue-950 font-bold text-base" : "text-blue-950"
-                  } transition hover:border-b-2 hover:border-blue-950 hover:font-bold hover:text-base`}
+                className={`${
+                  activeLink === "Services"
+                    ? "border-b-2 border-blue-950 font-bold text-base"
+                    : "text-blue-950"
+                } transition hover:border-b-2 hover:border-blue-950 hover:font-bold hover:text-base`}
               >
                 Services
               </Link>
@@ -133,7 +144,10 @@ const Header = () => {
                 <div className="absolute mt-2 w-48 bg-white text-blue-950 shadow-lg rounded-lg">
                   <ul className="py-2">
                     {["About Us", "Careers", "Contact"].map((option, idx) => (
-                      <li key={idx} className="px-4 py-2 hover:bg-blue-50 cursor-pointer">
+                      <li
+                        key={idx}
+                        className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                      >
                         {option}
                       </li>
                     ))}
@@ -143,21 +157,25 @@ const Header = () => {
             </div>
           </nav>
 
-          {/* Right Icons */}
+          {/* Right Icons and User Profile */}
           <div className="flex items-center gap-4">
-            <button className="flex items-center text-sm gap-1 bg-gray-100 hover:bg-blue-950 hover:text-white px-4 py-2 rounded-full">
+            <button className="flex items-center text-sm gap-1 bg-gray-100 hover:bg-blue-950 hover:text-white px-4 py-2 rounded-full  sm:flex">
               <FaPlus /> Appointment
             </button>
-            <button className="bg-gray-100 hover:bg-blue-950 hover:text-white p-2 rounded-full">
+            <button className="bg-gray-100 hover:bg-blue-950 hover:text-white p-2 rounded-full hidden sm:flex">
               <FaSearch />
             </button>
-            <button onClick={() => navigate("/rent/cart")} className="bg-gray-100 hover:bg-blue-950 hover:text-white p-2 rounded-full">
+            <button
+              onClick={() => navigate("/rent/cart")}
+              className="bg-gray-100 hover:bg-blue-950 hover:text-white p-2 rounded-full hidden sm:flex"
+            >
               <FaShoppingCart />
             </button>
-            <button className="flex items-center text-sm gap-2 bg-gray-100 hover:bg-blue-950 hover:text-white px-4 py-2 rounded-full">
+            <button className="flex items-center text-sm gap-2 bg-gray-100 hover:bg-blue-950 hover:text-white px-4 py-2 rounded-full sm:flex">
               <FaPhoneAlt /> +123-456-7890
             </button>
 
+            {/* User Dropdown */}
             {username ? (
               <div className="relative">
                 <button
@@ -169,8 +187,12 @@ const Header = () => {
                 {userDropdownOpen && (
                   <div className="absolute mt-2 w-40 bg-gray-100 shadow-lg rounded-lg">
                     <ul className="py-2">
-                      <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">Profile</li>
-                      <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">Settings</li>
+                      <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">
+                        Profile
+                      </li>
+                      <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">
+                        Settings
+                      </li>
                       <li
                         className="px-4 py-2 hover:bg-red-100 text-red-600 cursor-pointer"
                         onClick={handleLogout}
@@ -182,13 +204,15 @@ const Header = () => {
                 )}
               </div>
             ) : (
-              <Link to="/login" className="px-4 py-2 bg-blue-950 text-white rounded-full text-sm hover:bg-blue-800">
+              <Link
+                to="/login"
+                className="px-4 py-2 bg-blue-950 text-white rounded-full text-sm hover:bg-blue-800"
+              >
                 Login
               </Link>
             )}
-
             <motion.button
-              className="px-4 py-2 bg-gray-500 text-sm text-white hover:bg-blue-950 rounded-lg"
+              className="px-4 py-2 bg-gray-500 text-sm text-white hover:bg-blue-950 rounded-lg hidden sm:flex"
               whileTap={{ scale: 0.95 }}
             >
               Contact Us

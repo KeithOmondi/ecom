@@ -14,29 +14,13 @@ import RentingPage from "./components/Renting/RentingPage";
 import Header from "./components/Layout/Header";
 import BlogAndEventsPage from "./components/BlogsAndEvents/BlogAndEventsPage";
 import CartPage from "./components/Renting/CartPage";
-import LoginModal from "./components/Login/LoginModal";
-import PropTypes from "prop-types";
+//import LoginModal from "./components/Login/LoginModal";
+// //mport PropTypes from "prop-types";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+//import ProtectedRoute from "./components/routes/ProtectedRoute";
 
-function PrivateRoute({ element }) {
-  PrivateRoute.propTypes = {
-    element: PropTypes.element.isRequired,
-  };
-  const { isAuthenticated } = useSelector((state) => state.user);
-  const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setShowModal(true);
-    }
-  }, [isAuthenticated]);
 
-  if (!isAuthenticated) {
-    return showModal ? <LoginModal onClose={() => navigate("/login")} /> : null;
-  }
-
-  return element;
-}
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -72,12 +56,16 @@ function App() {
             <Route path="/login/otp" element={<OtpPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+                       
+
 
             {/* Protected Routes */}
-            <Route path="/rent" element={<PrivateRoute element={<RentingPage />} />} />
-            <Route path="/rent/cart" element={<PrivateRoute element={<CartPage />} />} />
+            <Route path="/rent" element={<RentingPage />} />
+            <Route path="/rent/cart" element={<CartPage />} />
 
             <Route path="/events" element={<BlogAndEventsPage />} />
+            
           </Routes>
         </>
       )}
