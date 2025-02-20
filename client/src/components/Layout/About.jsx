@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Modal from "react-modal";
-import Video2 from "../../assets/Video2.mp4";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"
 import { DateTimeRangePicker } from '@mui/x-date-pickers-pro/DateTimeRangePicker';
@@ -66,7 +65,7 @@ const About = () => {
 
         <div className="w-1/2">
           <motion.video
-            src={Video2}
+            src="https://videos.pexels.com/video-files/7578117/7578117-sd_640_360_30fps.mp4"
             className="w-full h-auto rounded-lg shadow-lg"
             autoPlay
             loop

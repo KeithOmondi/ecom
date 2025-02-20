@@ -6,29 +6,26 @@ import CEOMessage from "../../components/Layout/CEOMessage";
 import Listings from "../../components/Layout/Listings";
 import Footer from "../../components/Layout/Footer";
 
-import Video1 from "../../assets/Video1.mp4";
-import Video2 from "../../assets/Video3.mp4";
-import Video3 from "../../assets/Video4.mp4";
-import Video4 from "../../assets/Video5.mp4";
-
-const videos = [Video1, Video2, Video3, Video4];
+const videos = [
+  "https://videos.pexels.com/video-files/7578541/7578541-uhd_3840_2160_30fps.mp4",
+  "https://videos.pexels.com/video-files/7578553/7578553-uhd_3840_2160_30fps.mp4",
+  "https://videos.pexels.com/video-files/7578546/7578546-uhd_3840_2160_30fps.mp4",
+  "https://videos.pexels.com/video-files/7578552/7578552-uhd_3840_2160_30fps.mp4"
+];
 
 const HomePage = () => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const videoRef = useRef(null);
 
-  // Auto-play the next video when the source changes
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.load(); // Reload the video source
+      videoRef.current.load();
       videoRef.current.play().catch((error) => console.error("Auto-play error:", error));
     }
   }, [currentVideoIndex]);
 
   return (
     <div className="bg-gray-50">
-
-
       {/* Hero Section */}
       <div className="relative h-screen w-full overflow-hidden">
         <video
@@ -38,10 +35,7 @@ const HomePage = () => {
           autoPlay
           muted
           playsInline
-          onEnded={() =>
-            setCurrentVideoIndex((prevIndex) => (prevIndex + 1) % videos.length)
-          }
-          onCanPlay={() => videoRef.current?.play()}
+          onEnded={() => setCurrentVideoIndex((prevIndex) => (prevIndex + 1) % videos.length)}
         />
 
         <motion.div
@@ -60,9 +54,7 @@ const HomePage = () => {
               className="mt-8 px-6 py-3 bg-blue-950 text-white hover:bg-gray-100 hover:text-blue-950 rounded-lg text-lg font-semibold shadow-lg transition"
               whileTap={{ scale: 0.95 }}
               onClick={() => {
-                document
-                  .getElementById("listings")
-                  .scrollIntoView({ behavior: "smooth" });
+                document.getElementById("listings").scrollIntoView({ behavior: "smooth" });
               }}
             >
               Start Your Search
