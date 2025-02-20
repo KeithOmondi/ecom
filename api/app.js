@@ -27,8 +27,18 @@ if(process.env.NODE_ENV !== "PRODUCTION"){
 
 //import routes
 const user = require("./controller/user")
+const payment = require("./controller/payment")
+const property = require("./controller/property")
+const booking = require("./controller/booking")
+const residence = require("./controller/residence")
+const event = require("./controller/event")
 
 app.use("/api/v2/user", user)
+app.use("/api/v2/payment", payment)
+app.use("/api/v2/property", property)
+app.use("/api/v2/booking", booking)
+app.use("/api/v2/residence", residence)
+app.use("/api/v2/event", event)
 
 app.use(ErrorHandler);
 

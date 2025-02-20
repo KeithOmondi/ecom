@@ -11,12 +11,12 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import ForgotPassword from "./pages/auth/ForgotPasswordPage";
 import OtpPage from "./pages/auth/otp";
 import RentingPage from "./components/Renting/RentingPage";
-import Header from "./components/Layout/Header";
 import BlogAndEventsPage from "./components/BlogsAndEvents/BlogAndEventsPage";
 import CartPage from "./components/Renting/CartPage";
 //import LoginModal from "./components/Login/LoginModal";
 // //mport PropTypes from "prop-types";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
+import ProtectedAdminRoute from "./components/routes/ProtectedAdminRoute";
 //import ProtectedRoute from "./components/routes/ProtectedRoute";
 
 
@@ -31,14 +31,14 @@ function App() {
   }, []);
 
 
-  const authRoutes = [
+  {/*const authRoutes = [
     "/login",
     "/signup",
     "/forgot-password",
     "/login/otp",
-  ];
+  ];*/}
 
-  const isAuthPage = authRoutes.includes(location.pathname) || location.pathname.startsWith("/reset-password/");
+  {/*const isAuthPage = authRoutes.includes(location.pathname) || location.pathname.startsWith("/reset-password/");*/}
 
   return (
     <>
@@ -46,7 +46,7 @@ function App() {
         <Loader />
       ) : (
         <>
-          {!isAuthPage && <Header />}
+         
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
@@ -56,7 +56,11 @@ function App() {
             <Route path="/login/otp" element={<OtpPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+            <Route path="/admin-dashboard" element={
+              <ProtectedAdminRoute>
+                <AdminDashboardPage />
+              </ProtectedAdminRoute>
+            } />
                        
 
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { server } from "../../../server";
 import { toast } from "react-toastify";
@@ -11,56 +11,63 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
 
+  useEffect(() => {
+    const storedUser = JSON.parse(sessionStorage.getItem("user"));
+    if (storedUser?.role) {
+      redirectToDashboard(storedUser.role);
+    }
+  }, []);
+
+  const redirectToDashboard = (role) => {
+    switch (role) {
+      case "admin":
+        navigate("/admin-dashboard");
+        break;
+      case "agent":
+        navigate("/agent-dashboard");
+        break;
+      case "user":
+        navigate("/user-dashboard");
+        break;
+      default:
+        navigate("/home");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!email || !password) {
       return toast.error("Please provide both email and password");
     }
-  
+
+    const isAdmin = email.endsWith("@admin.com");
+    const loginRoute = isAdmin ? `${server}/user/login-admin` : `${server}/user/login-user`;
+
     try {
       const response = await axios.post(
-        `${server}/user/login-user`,
+        loginRoute,
         { email, password },
         { withCredentials: true }
       );
-  
-      if (response.status === 200 && response.data.success) {
+
+      if (response.data.success) {
         const { token, user } = response.data;
-  
-        // Store token and user info
         sessionStorage.setItem("token", token);
         sessionStorage.setItem("user", JSON.stringify(user));
-  
         toast.success("Login Successful");
-  
-        // Role-based redirection
-        switch (user.role) {
-          case "admin":
-            navigate("/admin-dashboard");
-            break;
-          case "agent":
-            navigate("/agent-dashboard");
-            break;
-          case "user":
-            navigate("/user-dashboard");
-            break;
-          default:
-            navigate("/home"); // Fallback if role is undefined
-            break;
-        }
+
+        console.log("User role:", user.role); // Debugging
+
+        redirectToDashboard(user.role);
       } else {
-        toast.error("Unexpected response status: " + response.status);
+        toast.error(response.data.message || "Login failed");
       }
     } catch (error) {
-      const message = error.response?.data?.message || "An error occurred";
-      toast.error(message);
+      console.error("Login error:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "An error occurred");
     }
   };
-  
-
-
 
   return (
     <div
@@ -70,30 +77,18 @@ const Login = () => {
           "url(https://png.pngtree.com/thumb_back/fh260/background/20230328/pngtree-living-room-interior-home-life-background-image_2119870.jpg)",
       }}
     >
-      {/* Blur Overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
-
-      {/* Login Box */}
       <div className="relative bg-white shadow-lg rounded-lg max-w-md w-full p-6 sm:p-8">
-        <h2 className="text-2xl font-bold text-gray-800 text-center">
-          Welcome Back
-        </h2>
-        <p className="text-sm text-gray-500 text-center mt-2">
-          Please login to your account
-        </p>
+        <h2 className="text-2xl font-bold text-gray-800 text-center">Welcome Back</h2>
+        <p className="text-sm text-gray-500 text-center mt-2">Please login to your account</p>
         <form className="mt-6" onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email Address
-            </label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
             <input
               type="email"
               id="email"
               name="email"
-              autoComplete="name"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -102,12 +97,7 @@ const Login = () => {
             />
           </div>
           <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
             <div className="relative">
               <input
                 type={visible ? "text" : "password"}
@@ -134,7 +124,6 @@ const Login = () => {
                 />
               )}
             </div>
-
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -144,12 +133,7 @@ const Login = () => {
                 type="checkbox"
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">Remember me</label>
             </div>
             <button
               type="button"
@@ -168,16 +152,10 @@ const Login = () => {
         </form>
         <p className="mt-6 text-center text-sm text-gray-600">
           Don&apos;t have an account?
-          <Link
-            to="/signup"
-            className="text-blue-600 font-medium hover:underline"
-          >
-            Sign up here
-          </Link>
+          <Link to="/signup" className="text-blue-600 font-medium hover:underline"> Sign up here</Link>
         </p>
       </div>
     </div>
-
   );
 };
 

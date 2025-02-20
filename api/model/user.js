@@ -23,12 +23,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Please enter your password"],
-      select: false,
+      select: false, // Will not be included in queries unless explicitly selected
     },
-    roles: {
-      type: [String],
+    role: {
+      type: String,
       enum: ["user", "admin"], // Restrict roles
-      default: ["user"],
+      default: "user",
     },
     activationCode: {
       type: String,
@@ -47,25 +47,25 @@ const userSchema = new mongoose.Schema(
 // Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Generate JWT Token
 userSchema.methods.getJwtToken = function () {
-  return jwt.sign({ id: this._id, roles: this.roles }, process.env.JWT_SECRET_KEY, {
+  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES || "7d",
   });
 };
 
 // Compare entered password with hashed password
 userSchema.methods.comparePasswords = async function (enteredPassword) {
-  try {
-    return await bcrypt.compare(enteredPassword, this.password);
-  } catch (error) {
-    throw new Error("Error comparing passwords");
-  }
+  return bcrypt.compare(enteredPassword, this.password);
 };
 
 // Generate and Hash Password Reset Token

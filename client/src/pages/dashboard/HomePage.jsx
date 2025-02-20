@@ -5,6 +5,7 @@ import PartnersSection from "../../components/Layout/PartnersSection";
 import CEOMessage from "../../components/Layout/CEOMessage";
 import Listings from "../../components/Layout/Listings";
 import Footer from "../../components/Layout/Footer";
+import Header from "../../components/Layout/Header";
 
 const videos = [
   "https://videos.pexels.com/video-files/7578541/7578541-uhd_3840_2160_30fps.mp4",
@@ -25,6 +26,9 @@ const HomePage = () => {
   }, [currentVideoIndex]);
 
   return (
+    <>
+    
+    <Header />
     <div className="bg-gray-50">
       {/* Hero Section */}
       <div className="relative h-screen w-full overflow-hidden">
@@ -69,6 +73,8 @@ const HomePage = () => {
       <CEOMessage />
       <Footer />
     </div>
+    
+    </>
   );
 };
 

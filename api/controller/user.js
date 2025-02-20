@@ -9,6 +9,8 @@ const sendToken = require("../utils/jwtToken");
 const { isAuthenticated, isAdmin } = require("../middleware/auth");
 const { sendResetPasswordEmail } = require("../utils/mailer");
 const bcrypt = require("bcryptjs")
+require("dotenv").config();
+
 
 //create user
 router.post("/create-user", async (req, res, next) => {
@@ -216,55 +218,95 @@ router.post('/reset-password', async (req, res) => {
 });
 
 
-// Default Admin Credentials (Change in .env)
-const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com";
-const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "Admin@123";
 
-// 1️⃣ Create Default Admin if not exists
+// Environment Variables
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Check if env variables are loaded correctly
+if (!ADMIN_EMAIL || !ADMIN_PASSWORD || !ADMIN_PASSWORD_HASH || !JWT_SECRET) {
+  console.error("Error: Missing required environment variables!");
+  process.exit(1); // Exit server if critical env variables are missing
+}
+
+// Function to create an admin account
 const createAdmin = async () => {
   try {
-    const adminExists = await User.findOne({ email: DEFAULT_ADMIN_EMAIL });
-    if (!adminExists) {
-      const hashedPassword = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10);
-      await User.create({
-        name: "Administrator",
-        email: DEFAULT_ADMIN_EMAIL,
+    const existingAdmin = await User.findOne({ email: ADMIN_EMAIL });
+
+    if (!existingAdmin) {
+      console.log("Admin does not exist. Creating new admin...");
+
+      // Hash the admin password before saving
+      const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
+      const adminUser = new User({
+        name: "Admin",
+        email: ADMIN_EMAIL,
         password: hashedPassword,
-        roles: ["admin"],
-        isActivated: true,
+        role: "admin", // Ensure role exists in the User schema
       });
-      console.log("✅ Default Admin Created");
+
+      await adminUser.save();
+      console.log("✅ Admin account created successfully!");
+    } else {
+      console.log("ℹ️ Admin already exists.");
     }
   } catch (error) {
-    console.error("❌ Error creating admin:", error.message);
+    console.error("❌ Error creating admin:", error);
   }
 };
-createAdmin(); // Run on server start
 
-// 2️⃣ Admin Login Route
-router.post("/login", async (req, res) => {
+// Run the script
+createAdmin();
+
+// Admin Login Route
+router.post("/login-admin", async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const { email, password } = req.body;
-    const admin = await User.findOne({ email }).select("+password");
+    console.log("📩 Incoming login request:", { email });
 
-    if (!admin || !admin.roles.includes("admin")) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    // Validate email and password
+    if (!email || !password) {
+      console.error("⚠️ Validation error: Missing email or password");
+      return res.status(400).json({ message: "Email and password are required." });
     }
 
-    const isMatch = await bcrypt.compare(password, admin.password);
+    // Check if email matches the admin email
+    if (email !== ADMIN_EMAIL) {
+      console.error("❌ Authentication error: Invalid email");
+      return res.status(401).json({ message: "Invalid admin credentials." });
+    }
+
+    // Check if ADMIN_PASSWORD_HASH is correctly loaded
+    if (!ADMIN_PASSWORD_HASH) {
+      console.error("⚠️ Error: ADMIN_PASSWORD_HASH is missing in .env");
+      return res.status(500).json({ message: "Server configuration error. Please check .env file." });
+    }
+
+    // Verify password
+    const isMatch = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      console.error("❌ Authentication error: Incorrect password");
+      return res.status(401).json({ message: "Invalid admin credentials." });
     }
 
-    const token = jwt.sign({ id: admin._id, roles: admin.roles }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "7d",
-    });
+    // Generate JWT token
+    const token = jwt.sign({ role: "admin" }, JWT_SECRET, { expiresIn: "2h" });
 
-    res.cookie("token", token, { httpOnly: true }).status(200).json({ message: "Admin Logged In", token });
+    console.log("✅ Login successful for:", email);
+    res.json({ message: "Login successful", token });
+
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error("❌ Server error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
+
 
 router.get("/admin-dashboard", isAuthenticated, isAdmin, (req, res) => {
   res.status(200).json({ message: "Welcome Admin!" });

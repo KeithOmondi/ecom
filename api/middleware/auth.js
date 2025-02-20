@@ -22,6 +22,28 @@ exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
   next();
 });
 
+
+//Agent auth middleware
+// Agent Authorization Middleware
+exports.isAgent = catchAsyncErrors(async (req, res, next) => {
+  const { token } = req.cookies;
+
+  if (!token) {
+    return next(new ErrorHandler("Please login as an agent!", 401));
+  }
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+  req.user = await User.findById(decoded.id);
+
+  if (!req.user || req.user.role !== "agent") {
+    return next(new ErrorHandler("Access denied! Agent role required.", 403));
+  }
+
+  next();
+});
+
+
 // Admin Authorization Middleware
 exports.isAdmin = (...roles) => {
   return (req,res,next) => {
