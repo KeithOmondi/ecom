@@ -111,7 +111,7 @@ export default function RentingPage() {
     <Header />
     <div className="p-6 bg-gray-100 text-gray-900 min-h-screen">
       <motion.h1
-        className="text-3xl font-bold text-center mb-6"
+        className="text-2xl md:text-3xl font-bold text-center mb-6"
         animate={{ opacity: 1, y: 0 }}
         initial={{ opacity: 0, y: -10 }}
       >
@@ -119,13 +119,11 @@ export default function RentingPage() {
       </motion.h1>
 
       {/* Filter Card */}
-      <div className="bg-white shadow-md p-4 rounded-lg flex justify-center gap-4 mb-6">
+      <div className="bg-white shadow-md p-4 rounded-lg flex flex-wrap justify-center gap-2 md:gap-4 mb-6">
         <button
           onClick={() => setSelectedCategory("All")}
-          className={`px-4 py-2 rounded ${
-            selectedCategory === "All"
-              ? "bg-blue-950 text-white"
-              : "bg-gray-200"
+          className={`px-3 py-2 text-sm md:text-base rounded ${
+            selectedCategory === "All" ? "bg-blue-950 text-white" : "bg-gray-200"
           }`}
         >
           All
@@ -134,10 +132,8 @@ export default function RentingPage() {
           <button
             key={name}
             onClick={() => setSelectedCategory(name)}
-            className={`px-4 py-2 rounded flex items-center gap-2 ${
-              selectedCategory === name
-                ? "bg-blue-950 text-white"
-                : "bg-gray-200"
+            className={`px-3 py-2 text-sm md:text-base rounded flex items-center gap-2 ${
+              selectedCategory === name ? "bg-blue-950 text-white" : "bg-gray-200"
             }`}
           >
             <Icon /> {name}
@@ -146,17 +142,17 @@ export default function RentingPage() {
       </div>
 
       {/* Listings */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredListings.map(({ id, name, price, image }) => (
           <motion.div
             key={id}
             className="bg-white shadow-lg rounded-lg overflow-hidden"
             whileHover={{ scale: 1.03 }}
           >
-            <img src={image} alt={name} className="w-full h-48 object-cover" />
+            <img src={image} alt={name} className="w-full h-40 sm:h-48 object-cover" />
             <div className="p-4">
-              <h2 className="text-xl font-bold">{name}</h2>
-              <p className="text-lg text-blue-700 font-semibold">{price}</p>
+              <h2 className="text-lg sm:text-xl font-bold">{name}</h2>
+              <p className="text-md sm:text-lg text-blue-700 font-semibold">{price}</p>
               <button
                 className="mt-4 w-full bg-blue-950 text-white flex items-center justify-center py-2 rounded hover:bg-blue-700"
                 onClick={() => handleRentClick({ name, price })}
@@ -169,34 +165,17 @@ export default function RentingPage() {
       </div>
 
       {/* Confirm Rent Modal */}
-      <Dialog
-        open={showConfirmModal}
-        onClose={() => setShowConfirmModal(false)}
-        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-      >
-        <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg">
-          <Dialog.Title className="text-xl font-bold">
-            Confirm Rental
-          </Dialog.Title>
+      <Dialog open={showConfirmModal} onClose={() => setShowConfirmModal(false)} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+          <Dialog.Title className="text-lg sm:text-xl font-bold">Confirm Rental</Dialog.Title>
           <p className="mt-2">
-            Are you sure you want to rent{" "}
-            <span className="font-semibold">{selectedListing?.name}</span> for{" "}
-            <span className="text-blue-600 font-semibold">
-              {selectedListing?.price}
-            </span>
-            ?
+            Are you sure you want to rent <span className="font-semibold">{selectedListing?.name}</span> for <span className="text-blue-600 font-semibold">{selectedListing?.price}</span>?
           </p>
           <div className="flex justify-end gap-3 mt-4">
-            <button
-              className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-              onClick={() => setShowConfirmModal(false)}
-            >
+            <button className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => setShowConfirmModal(false)}>
               Cancel
             </button>
-            <button
-              className="px-4 py-2 bg-blue-950 text-white rounded hover:bg-blue-700"
-              onClick={confirmRent}
-            >
+            <button className="px-4 py-2 bg-blue-950 text-white rounded hover:bg-blue-700" onClick={confirmRent}>
               Add to Cart
             </button>
           </div>
@@ -204,41 +183,24 @@ export default function RentingPage() {
       </Dialog>
 
       {/* Payment Selection Modal */}
-      <Dialog
-        open={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
-        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-      >
-        <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg">
-          <Dialog.Title className="text-xl font-bold">
-            Choose Payment Method
-          </Dialog.Title>
-          <p className="mt-2">
-            How would you like to pay for{" "}
-            <span className="font-semibold">{selectedListing?.name}</span>?
-          </p>
+      <Dialog open={showPaymentModal} onClose={() => setShowPaymentModal(false)} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+          <Dialog.Title className="text-lg sm:text-xl font-bold">Choose Payment Method</Dialog.Title>
+          <p className="mt-2">How would you like to pay for <span className="font-semibold">{selectedListing?.name}</span>?</p>
           <div className="mt-4 space-y-3">
-            <button className="w-full px-4 py-2 bg-blue-950 text-white rounded hover:bg-blue-700">
-              Pay via Mpesa
-            </button>
-            <button className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-              Pay via Credit Card
-            </button>
-            <button className="w-full px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-              Pay via PayPal
-            </button>
+            <button className="w-full px-4 py-2 bg-blue-950 text-white rounded hover:bg-blue-700">Pay via Mpesa</button>
+            <button className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Pay via Credit Card</button>
+            <button className="w-full px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Pay via PayPal</button>
           </div>
           <div className="flex justify-end mt-4">
-            <button
-              className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-              onClick={() => setShowPaymentModal(false)}
-            >
+            <button className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500" onClick={() => setShowPaymentModal(false)}>
               Close
             </button>
           </div>
         </Dialog.Panel>
       </Dialog>
     </div>
+  
     
     </>
   );

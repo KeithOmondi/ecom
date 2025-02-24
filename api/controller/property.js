@@ -11,53 +11,55 @@ const ErrorHandler = require("../utils/ErrorHandler");
 const sendPropertyToken = require("../utils/propertyToken");
 
 // create property
-router.post("/create-property", catchAsyncErrors(async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    const agentEmail = await Property.findOne({ email });
-    if (agentEmail) {
-      return next(new ErrorHandler("User already exists", 400));
-    }
-
-    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-      folder: "avatars",
-    });
-
-    const agent = {
-      name: req.body.name,
-      email: email,
-      password: req.body.password,
-      avatar: {
-        public_id: myCloud.public_id,
-        url: myCloud.secure_url,
-      },
-      address: req.body.address,
-      phoneNumber: req.body.phoneNumber,
-      zipCode: req.body.zipCode,
-      role: "Agent",
-    };
-
-    const activationToken = createActivationToken(agent);
-
-    const activationUrl = `http://localhost:5173/agent/activation/${activationToken}`;
-
+// create property (Only Admins can create accounts)
+router.post(
+  "/create-property",
+  isAuthenticated,  // Ensures the user is logged in
+  isAdmin,          // Ensures the user is an admin
+  catchAsyncErrors(async (req, res, next) => {
     try {
-      await sendMail({
-        email: agent.email,
-        subject: "Activate your Property",
-        message: `Hello ${agent.name}, please click on the link to activate your property: ${activationUrl}`,
+      const { email } = req.body;
+      const agentEmail = await Property.findOne({ email });
+      if (agentEmail) {
+        return next(new ErrorHandler("User already exists", 400));
+      }
+
+      const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        folder: "avatars",
       });
-      res.status(201).json({
-        success: true,
-        message: `Please check your email:- ${agent.email} to activate your property!`,
-      });
+
+      const agent = {
+        name: req.body.name,
+        email: email,
+        password: req.body.password,
+        address: req.body.address,
+        phoneNumber: req.body.phoneNumber,
+        zipCode: req.body.zipCode,
+        role: "Agent",
+      };
+
+      const activationToken = createActivationToken(agent);
+      const activationUrl = `http://localhost:5173/agent/activation/${activationToken}`;
+
+      try {
+        await sendMail({
+          email: agent.email,
+          subject: "Activate your Property",
+          message: `Hello ${agent.name}, please click on the link to activate your property: ${activationUrl}`,
+        });
+        res.status(201).json({
+          success: true,
+          message: `Please check your email: ${agent.email} to activate your property!`,
+        });
+      } catch (error) {
+        return next(new ErrorHandler(error.message, 500));
+      }
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+      return next(new ErrorHandler(error.message, 400));
     }
-  } catch (error) {
-    return next(new ErrorHandler(error.message, 400));
-  }
-}));
+  })
+);
+
 
 // create activation token
 const createActivationToken = (agent) => {

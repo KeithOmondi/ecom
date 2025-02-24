@@ -5,15 +5,17 @@ import { useSelector } from 'react-redux'
 
 const LoginPage = () => {
   const navigate = useNavigate()
-  const { isAuthenticated } = useSelector((state) => state.user)
+  const { isAuthenticated, user } = useSelector((state) => state.user) // Ensure `user` is retrieved
 
   useEffect(() => {
-    if (isAuthenticated === true) {
-      navigate("/home")
-    } else {
-      navigate("/login")
+    if (isAuthenticated) {
+      if (user?.role === "admin") {
+        navigate("/admin-dashboard") // Redirect admins to their dashboard
+      } else {
+        navigate("/home") // Redirect regular users
+      }
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, user, navigate]) // Depend on `user` to get role changes
 
   return (
     <div>

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardMedia, Avatar, Button, Divider, IconButton } from "@mui/material";
 import { motion } from "framer-motion";
 import { Favorite, Repeat, ChatBubbleOutline, Share } from "@mui/icons-material";
+import Footer from "../Layout/Footer";
+import Header from "../Layout/Header";
 
 const initialPosts = [
     { id: 1, user: "John Doe", avatar: "https://randomuser.me/api/portraits/men/1.jpg", content: "Just listed a new rental!", image: "https://source.unsplash.com/600x400/?apartment", timestamp: "2h ago", type: "post" },
@@ -27,7 +29,9 @@ const BlogAndEventsPage = () => {
     }, []);
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen flex gap-6">
+       <>
+       <Header />
+       <div className="p-6 bg-gray-50 min-h-screen flex gap-6">
             {/* Posts Section */}
             <div className="w-1/3 space-y-6">
                 <h2 className="text-2xl font-bold text-gray-700">Social Posts</h2>
@@ -95,6 +99,10 @@ const BlogAndEventsPage = () => {
                 ))}
             </div>
         </div>
+
+        <Footer />
+       
+       </>
     );
 };
 

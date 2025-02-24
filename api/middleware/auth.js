@@ -46,11 +46,17 @@ exports.isAgent = catchAsyncErrors(async (req, res, next) => {
 
 // Admin Authorization Middleware
 exports.isAdmin = (...roles) => {
-  return (req,res,next) => {
-      if(!roles.includes(req.user.role)){
-          return next(new ErrorHandler(`${req.user.role} can not access this resources!`))
-      };
-      next();
-  }
-}
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return next(
+        new ErrorHandler(
+          `Access denied! ${req.user ? req.user.role : "Unauthorized user"} cannot access this resource.`,
+          403
+        )
+      );
+    }
+    next();
+  };
+};
+
 
