@@ -20,6 +20,7 @@ import AdminDashboardPage from "./pages/AdminDashboardPage";
 import PropertyDashboardPage from "./pages/property/PropertyDashboardPage";
 import AdminDashboardUsers from "./pages/AdminDashboardUsers";
 import AdminDashboardAgents from "./pages/AdminDashboardAgents";
+import AdminDashboardBookings from "./pages/AdminDashboardBookings";
 //import ProtectedRoute from "./components/routes/ProtectedRoute";
 
 function App() {
@@ -71,6 +72,7 @@ function App() {
               path="/admin-agents"
               element={<AdminDashboardAgents />}
             />
+            <Route path="/admin-bookings" element={<AdminDashboardBookings />} />
 
             {/* Protected Routes */}
             <Route path="/rent" element={<RentingPage />} />

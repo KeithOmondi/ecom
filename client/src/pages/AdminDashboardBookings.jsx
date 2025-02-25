@@ -5,7 +5,7 @@ import { getAllBookingsOfAdmin } from "../../redux/actions/booking";
 import AdminHeader from "../components/Layout/AdminHeader";
 import AdminSideBar from "../components/Admin/Layout/AdminSideBar";
 
-const AdminDashboardOrders = () => {
+const AdminDashboardBookings = () => {
   const dispatch = useDispatch();
 
   const { adminBookings, adminOrderLoading } = useSelector(
@@ -17,7 +17,7 @@ const AdminDashboardOrders = () => {
   }, []);
 
   const columns = [
-    { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
+    { field: "id", headerName: "Booking ID", minWidth: 150, flex: 0.7 },
 
     {
       field: "status",
@@ -31,8 +31,8 @@ const AdminDashboardOrders = () => {
       },
     },
     {
-      field: "itemsQty",
-      headerName: "Items Qty",
+      field: "Quantity",
+      headerName: "Quantity",
       type: "number",
       minWidth: 130,
       flex: 0.7,
@@ -60,7 +60,7 @@ const AdminDashboardOrders = () => {
       row.push({
         id: item._id,
         itemsQty: item?.cart?.reduce((acc, item) => acc + item.qty, 0),
-        total: item?.totalPrice + " $",
+        total: item?.totalPrice + " Ksh",
         status: item?.status,
         createdAt: item?.createdAt.slice(0,10),
       });
@@ -91,4 +91,4 @@ const AdminDashboardOrders = () => {
   );
 };
 
-export default AdminDashboardOrders;
+export default AdminDashboardBookings;

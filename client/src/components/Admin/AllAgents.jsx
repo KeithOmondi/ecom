@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
-import { Button } from "@material-ui/core";
-import styles from "../../styles/styles";
+import { Button } from "@mui/material";
 import { RxCross1 } from "react-icons/rx";
 import axios from "axios";
-import { server } from "../../server";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { getAllAgents } from "../../../redux/actions/agents";
+import { server } from "../../../server";
 
 const AllAgents = () => {
   const dispatch = useDispatch();
@@ -32,7 +31,7 @@ const AllAgents = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "Seller ID", minWidth: 150, flex: 0.7 },
+    { field: "id", headerName: "Agents ID", minWidth: 150, flex: 0.7 },
 
     {
       field: "name",
@@ -66,13 +65,13 @@ const AllAgents = () => {
         field: "  ",
         flex: 1,
         minWidth: 150,
-        headerName: "Preview Shop",
+        headerName: "Preview Property",
         type: "number",
         sortable: false,
         renderCell: (params) => {
           return (
             <>
-            <Link to={`/shop/preview/${params.id}`}>
+            <Link to={`/property/preview/${params.id}`}>
             <Button>
                 <AiOutlineEye size={20} />
               </Button>
@@ -85,7 +84,7 @@ const AllAgents = () => {
       field: " ",
       flex: 1,
       minWidth: 150,
-      headerName: "Delete Seller",
+      headerName: "Delete Agent",
       type: "number",
       sortable: false,
       renderCell: (params) => {
@@ -136,13 +135,13 @@ const AllAgents = () => {
               </h3>
               <div className="w-full flex items-center justify-center">
                 <div
-                  className={`${styles.button} text-white text-[18px] !h-[42px] mr-4`}
+                  className="text-white text-[18px] !h-[42px] mr-4"
                   onClick={() => setOpen(false)}
                 >
                   cancel
                 </div>
                 <div
-                  className={`${styles.button} text-white text-[18px] !h-[42px] ml-4`}
+                  className= "text-white text-[18px] !h-[42px] ml-4"
                   onClick={() =>  setOpen(false) || handleDelete(userId)}
                 >
                   confirm

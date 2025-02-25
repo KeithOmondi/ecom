@@ -26,3 +26,24 @@ export const loadUser = () => async (dispatch) => {
     });
   }
 };
+
+// Example of exporting a function
+export const getAllUsers = () => async (dispatch) => {
+  try {
+    const { data } = await axios.get(`${server}/user/getallusers`, {
+      withCredentials: true,
+    });
+
+    dispatch({
+      type: "GetAllUsersSuccess",
+      payload: data.users,
+    });
+  } catch (error) {
+    console.error("GetAllUsers Error:", error);
+
+    dispatch({
+      type: "GetAllUsersFail",
+      payload: error.response?.data?.message || "Something went wrong",
+    });
+  }
+};
