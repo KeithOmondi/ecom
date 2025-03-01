@@ -8,9 +8,8 @@ const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
 const { isAuthenticated, isAdmin } = require("../middleware/auth");
 const { sendResetPasswordEmail } = require("../utils/mailer");
-const bcrypt = require("bcryptjs")
+const bcrypt = require("bcryptjs");
 require("dotenv").config();
-
 
 //create user
 router.post("/create-user", async (req, res, next) => {
@@ -57,7 +56,7 @@ router.post("/create-user", async (req, res, next) => {
 const createActivationToken = (user) => {
   // Set token expiration to 1 hour for example
   return jwt.sign(user, process.env.ACTIVATION_SECRET, {
-    expiresIn: "1h",  // Token expires in 1 hour
+    expiresIn: "1h", // Token expires in 1 hour
   });
 };
 
@@ -67,7 +66,7 @@ router.post(
   catchAsyncErrors(async (req, res, next) => {
     try {
       const { activation_token } = req.body;
- 
+
       const newUser = jwt.verify(
         activation_token,
         process.env.ACTIVATION_SECRET
@@ -96,43 +95,41 @@ router.post(
   })
 );
 
-
 //login user
 // Example: Express Backend Login Route
 router.post("/login-user", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+    return res.status(400).json({ message: "Email and password are required" });
   }
 
   try {
-      const user = await User.findOne({ email }).select("+password");
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
-      }
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-      const isMatch = await user.comparePasswords(password);
-      if (!isMatch) {
-          return res.status(401).json({ message: "Invalid credentials" });
-      }
+    const isMatch = await user.comparePasswords(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-      const token = user.getJwtToken();
+    const token = user.getJwtToken();
 
-      res.status(200).json({
-          success: true,
-          token,
-          user: {
-              id: user._id,
-              email: user.email,
-              name: user.name,
-          },
-      });
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+      },
+    });
   } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
 
 //load user
 router.get(
@@ -155,9 +152,28 @@ router.get(
   })
 );
 
+// Get all users (Admin only)
+router.get(
+  "/getallusers",
+  isAuthenticated,
+  isAdmin, // Make sure only admins can access this route
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      // Fetch all users from the database, excluding the admin if needed
+      const users = await User.find(); // You can add filters to exclude certain roles if needed (e.g., excluding admin)
+
+      res.status(200).json({
+        success: true,
+        users, // Send back the list of users
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500)); // Return error message if something goes wrong
+    }
+  })
+);
 
 // Forgot Password Route
-router.post('/forgot-password', async (req, res) => {
+router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
   try {
@@ -168,7 +184,9 @@ router.post('/forgot-password', async (req, res) => {
     }
 
     // Generate a reset token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1h",
+    });
 
     // Create a password reset URL
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
@@ -176,21 +194,21 @@ router.post('/forgot-password', async (req, res) => {
     // Send email to user with reset link
     await sendResetPasswordEmail(user.email, resetLink);
 
-    res.status(200).json({ message: 'Password reset link sent' });
+    res.status(200).json({ message: "Password reset link sent" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
 // Reset Password Route
-router.post('/reset-password', async (req, res) => {
-  const { token, password } = req.body;  // Ensure 'token' is sent in the body
+router.post("/reset-password", async (req, res) => {
+  const { token, password } = req.body; // Ensure 'token' is sent in the body
 
   try {
     // Check if token exists
     if (!token) {
-      return res.status(400).json({ message: 'Token is required' });
+      return res.status(400).json({ message: "Token is required" });
     }
 
     // Verify the token
@@ -200,7 +218,7 @@ router.post('/reset-password', async (req, res) => {
     // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Hash the new password
@@ -210,12 +228,72 @@ router.post('/reset-password', async (req, res) => {
     user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({ message: 'Password has been reset successfully' });
+    res.status(200).json({ message: "Password has been reset successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 });
+
+// update user info
+router.put(
+  "/update-user-info",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const { email, password, phoneNumber, name } = req.body;
+
+      const user = await User.findOne({ email }).select("+password");
+
+      if (!user) {
+        return next(new ErrorHandler("User not found", 400));
+      }
+
+      const isPasswordValid = await user.comparePassword(password);
+
+      if (!isPasswordValid) {
+        return next(
+          new ErrorHandler("Please provide the correct information", 400)
+        );
+      }
+
+      user.name = name;
+      user.email = email;
+      user.phoneNumber = phoneNumber;
+
+      await user.save();
+
+      res.status(201).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// log out user
+router.get(
+  "/logout",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      res.clearCookie("token", {
+        httpOnly: true,
+        sameSite: "None",
+        secure: process.env.NODE_ENV === "production",
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Logout successful!",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
 
 
 
@@ -271,7 +349,9 @@ router.post("/login-admin", async (req, res) => {
     // Validate email and password
     if (!email || !password) {
       console.error("⚠️ Validation error: Missing email or password");
-      return res.status(400).json({ message: "Email and password are required." });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required." });
     }
 
     // Check if email matches the admin email
@@ -283,7 +363,11 @@ router.post("/login-admin", async (req, res) => {
     // Check if ADMIN_PASSWORD_HASH is correctly loaded
     if (!ADMIN_PASSWORD_HASH) {
       console.error("⚠️ Error: ADMIN_PASSWORD_HASH is missing in .env");
-      return res.status(500).json({ message: "Server configuration error. Please check .env file." });
+      return res
+        .status(500)
+        .json({
+          message: "Server configuration error. Please check .env file.",
+        });
     }
 
     // Verify password
@@ -299,41 +383,40 @@ router.post("/login-admin", async (req, res) => {
 
     console.log("✅ Login successful for:", email);
     res.json({ message: "Login successful", token });
-
   } catch (error) {
     console.error("❌ Server error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-
-
 router.get("/admin-dashboard", isAuthenticated, isAdmin, (req, res) => {
   res.status(200).json({ message: "Welcome Admin!" });
 });
 
-
 // 3️⃣ Change Admin Password (Protected)
-router.put("/change-password", isAuthenticated, isAdmin("admin"), async (req, res) => {
-  try {
-    const { oldPassword, newPassword } = req.body;
-    const admin = await User.findById(req.user.id).select("+password");
+router.put(
+  "/change-password",
+  isAuthenticated,
+  isAdmin("admin"),
+  async (req, res) => {
+    try {
+      const { oldPassword, newPassword } = req.body;
+      const admin = await User.findById(req.user.id).select("+password");
 
-    if (!admin) return res.status(404).json({ message: "Admin not found" });
+      if (!admin) return res.status(404).json({ message: "Admin not found" });
 
-    const isMatch = await bcrypt.compare(oldPassword, admin.password);
-    if (!isMatch) return res.status(400).json({ message: "Incorrect old password" });
+      const isMatch = await bcrypt.compare(oldPassword, admin.password);
+      if (!isMatch)
+        return res.status(400).json({ message: "Incorrect old password" });
 
-    admin.password = await bcrypt.hash(newPassword, 10);
-    await admin.save();
+      admin.password = await bcrypt.hash(newPassword, 10);
+      await admin.save();
 
-    res.status(200).json({ message: "Password updated successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
+      res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Server Error", error: error.message });
+    }
   }
-});
-
-
-
+);
 
 module.exports = router;

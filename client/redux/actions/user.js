@@ -1,7 +1,7 @@
 import axios from "axios";
 import { server } from "../../server";
 
-// Load User
+// Load user
 export const loadUser = () => async (dispatch) => {
   try {
     dispatch({ type: "LoadUserRequest" });
@@ -10,40 +10,122 @@ export const loadUser = () => async (dispatch) => {
       withCredentials: true,
     });
 
-    dispatch({
-      type: "LoadUserSuccess",
-      payload: {
-        user: data.user,
-        role: data.user.role, // Assuming API response contains user.role
-      },
-    });
+    dispatch({ type: "LoadUserSuccess", payload: data.user });
   } catch (error) {
-    console.error("LoadUser Error:", error); // Debugging
-
     dispatch({
       type: "LoadUserFail",
-      payload: error.response?.data?.message || "Something went wrong",
+      payload: error.response?.data?.message || "Failed to load user",
     });
   }
 };
 
-// Example of exporting a function
-export const getAllUsers = () => async (dispatch) => {
+// Load agent
+export const loadAgent = () => async (dispatch) => {
   try {
-    const { data } = await axios.get(`${server}/user/getallusers`, {
+    dispatch({ type: "LoadAgentRequest" });
+
+    const { data } = await axios.get(`${server}/property/getAgent`, {
       withCredentials: true,
     });
 
-    dispatch({
-      type: "GetAllUsersSuccess",
-      payload: data.users,
-    });
+    dispatch({ type: "LoadAgentSuccess", payload: data.seller });
   } catch (error) {
-    console.error("GetAllUsers Error:", error);
+    dispatch({
+      type: "LoadAgentFail",
+      payload: error.response?.data?.message || "Failed to load agent",
+    });
+  }
+};
+
+// Update user information
+export const updateUserInformation =
+  (name, email, phoneNumber, password) => async (dispatch) => {
+    try {
+      dispatch({ type: "updateUserInfoRequest" });
+
+      const { data } = await axios.put(
+        `${server}/user/update-user-info`,
+        { name, email, phoneNumber, password },
+        { withCredentials: true }
+      );
+
+      dispatch({ type: "updateUserInfoSuccess", payload: data.user });
+    } catch (error) {
+      dispatch({
+        type: "updateUserInfoFailed",
+        payload: error.response?.data?.message || "Failed to update user info",
+      });
+    }
+  };
+
+// Update user address
+export const updateUserAddress =
+  (country, city, address1, address2, zipCode, addressType) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: "updateUserAddressRequest" });
+
+      const { data } = await axios.put(
+        `${server}/user/update-user-addresses`,
+        { country, city, address1, address2, zipCode, addressType },
+        { withCredentials: true }
+      );
+
+      dispatch({
+        type: "updateUserAddressSuccess",
+        payload: {
+          successMessage: "User address updated successfully!",
+          user: data.user,
+        },
+      });
+    } catch (error) {
+      dispatch({
+        type: "updateUserAddressFailed",
+        payload:
+          error.response?.data?.message || "Failed to update user address",
+      });
+    }
+  };
+
+// Delete user address
+export const deleteUserAddress = (id) => async (dispatch) => {
+  try {
+    dispatch({ type: "deleteUserAddressRequest" });
+
+    const { data } = await axios.delete(
+      `${server}/user/delete-user-address/${id}`,
+      { withCredentials: true }
+    );
 
     dispatch({
-      type: "GetAllUsersFail",
-      payload: error.response?.data?.message || "Something went wrong",
+      type: "deleteUserAddressSuccess",
+      payload: {
+        successMessage: "User address deleted successfully!",
+        user: data.user,
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: "deleteUserAddressFailed",
+      payload: error.response?.data?.message || "Failed to delete user address",
+    });
+  }
+};
+
+// Get all users (Admin)
+export const getAllUsers = () => async (dispatch) => {
+  try {
+    dispatch({ type: "getAllUsersRequest" });
+
+    const { data } = await axios.get(`${server}/user/getAllUsers`, {
+      withCredentials: true,
+    });
+
+    dispatch({ type: "getAllUsersSuccess", payload: data.users });
+  } catch (error) {
+    dispatch({
+      type: "getAllUsersFailed",
+      payload: error.response?.data?.message || "Failed to get all users",
     });
   }
 };

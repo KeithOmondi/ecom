@@ -187,9 +187,9 @@ const Header = () => {
                 {userDropdownOpen && (
                   <div className="absolute mt-2 w-40 bg-gray-100 shadow-lg rounded-lg">
                     <ul className="py-2">
-                      <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">
+                      <Link to="/profile" className="px-4 py-2 hover:bg-blue-50 cursor-pointer">
                         Profile
-                      </li>
+                      </Link>
                       <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">
                         Settings
                       </li>

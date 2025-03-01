@@ -21,6 +21,12 @@ import PropertyDashboardPage from "./pages/property/PropertyDashboardPage";
 import AdminDashboardUsers from "./pages/AdminDashboardUsers";
 import AdminDashboardAgents from "./pages/AdminDashboardAgents";
 import AdminDashboardBookings from "./pages/AdminDashboardBookings";
+import AdminDashboardProperty from "./pages/AdminDashboardProperty";
+import AdminDashboardEvents from "./pages/AdminDashboardEvents";
+import AdminDashboardWithdraw from "./pages/AdminDashboardWithdraw";
+import ProfilePage from "./pages/ProfilePage";
+import AdminLogin from "./pages/auth/AdminLogin";
+import ProtectedAdminRoute from "./components/routes/ProtectedAdminRoute";
 //import ProtectedRoute from "./components/routes/ProtectedRoute";
 
 function App() {
@@ -54,6 +60,7 @@ function App() {
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route
               path="/activation/:activation_token"
@@ -62,21 +69,32 @@ function App() {
             <Route path="/login/otp" element={<OtpPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+            <Route path="/admin-dashboard" element={
+              <ProtectedAdminRoute>
+                <AdminDashboardPage />
+              </ProtectedAdminRoute>
+            } />
             <Route path="/admin-users" element={<AdminDashboardUsers />} />
             <Route
               path="/agent-dashboard"
               element={<PropertyDashboardPage />}
             />
+            <Route path="/admin-agents" element={<AdminDashboardAgents />} />
             <Route
-              path="/admin-agents"
-              element={<AdminDashboardAgents />}
+              path="/admin-booking"
+              element={<AdminDashboardBookings />}
             />
-            <Route path="/admin-bookings" element={<AdminDashboardBookings />} />
+            <Route
+              path="/admin-property"
+              element={<AdminDashboardProperty />}
+            />
+            <Route path="/admin-events" element={ <AdminDashboardEvents />} />
+            <Route path="/admin-withdraw-request" element={<AdminDashboardWithdraw />} />
 
             {/* Protected Routes */}
             <Route path="/rent" element={<RentingPage />} />
             <Route path="/rent/cart" element={<CartPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
 
             <Route path="/events" element={<BlogAndEventsPage />} />
           </Routes>

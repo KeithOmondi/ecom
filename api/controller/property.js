@@ -14,8 +14,8 @@ const sendPropertyToken = require("../utils/propertyToken");
 // create property (Only Admins can create accounts)
 router.post(
   "/create-property",
-  isAuthenticated,  // Ensures the user is logged in
-  isAdmin,          // Ensures the user is an admin
+  isAuthenticated, // Ensures the user is logged in
+  isAdmin, // Ensures the user is an admin
   catchAsyncErrors(async (req, res, next) => {
     try {
       const { email } = req.body;
@@ -59,7 +59,6 @@ router.post(
     }
   })
 );
-
 
 // create activation token
 const createActivationToken = (agent) => {
@@ -144,24 +143,48 @@ router.post(
 
 // load agent
 router.get(
-    "/getAgent",
-    isAgent,
-    catchAsyncErrors(async (req, res, next) => {
-      try {
-        const agent = await Property.findById(req.agent._id);
-  
-        if (!agent) {
-          return next(new ErrorHandler("User doesn't exist", 400));
-        }
-  
-        res.status(200).json({
-          success: true,
-          agent,
-        });
-      } catch (error) {
-        return next(new ErrorHandler(error.message, 500));
+  "/getAgent",
+  isAgent,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const agent = await Property.findById(req.agent._id);
+
+      if (!agent) {
+        return next(new ErrorHandler("User doesn't exist", 400));
       }
-    })
-  );
-  
+
+      res.status(200).json({
+        success: true,
+        agent,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// Get all agents (Only Admin can view)
+router.get(
+  "/admin-all-agents",
+  isAuthenticated, // Ensures the user is logged in
+  isAdmin, // Ensures only admin users can access this route
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      // Fetch all agents (users with the role "Agent")
+      const agents = await Property.find({ role: "Agent" });
+
+      if (agents.length === 0) {
+        return next(new ErrorHandler("No agents found", 404));
+      }
+
+      res.status(200).json({
+        success: true,
+        agents, // Return the list of agents
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500)); // Handle any errors
+    }
+  })
+);
+
 module.exports = router;

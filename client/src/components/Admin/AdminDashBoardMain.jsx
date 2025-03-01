@@ -91,7 +91,7 @@ const AdminDashboardMain = () => {
                 ),
                 title: "All Agents",
                 value: agents?.length || 0,
-                link: "/admin-sellers",
+                link: "/admin-agents",
                 linkText: "View Agents",
               },
               {
@@ -103,7 +103,7 @@ const AdminDashboardMain = () => {
                 ),
                 title: "All Bookings",
                 value: adminBookings?.length || 0,
-                link: "/admin-orders",
+                link: "/admin-booking",
                 linkText: "View Bookings",
               },
             ].map((item, index) => (

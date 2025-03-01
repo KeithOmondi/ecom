@@ -48,7 +48,7 @@ const AllAgents = () => {
     },
     {
       field: "address",
-      headerName: "Seller Address",
+      headerName: "Agent Address",
       type: "text",
       minWidth: 130,
       flex: 0.7,
@@ -114,7 +114,7 @@ const AllAgents = () => {
   return (
     <div className="w-full flex justify-center pt-5">
       <div className="w-[97%]">
-        <h3 className="text-[22px] font-Poppins pb-2">All Users</h3>
+        <h3 className="text-[22px] font-Poppins pb-2">All Agents</h3>
         <div className="w-full min-h-[45vh] bg-white rounded">
           <DataGrid
             rows={row}

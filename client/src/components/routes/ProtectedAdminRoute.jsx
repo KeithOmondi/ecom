@@ -9,11 +9,11 @@ const ProtectedAdminRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin-login" replace />;
   }
 
   if (user?.role !== "Admin") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin-dashboard" replace />;
   }
 
   return children;

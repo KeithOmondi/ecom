@@ -13,26 +13,10 @@ const Login = () => {
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
-    if (storedUser?.role) {
-      redirectToDashboard(storedUser.role);
+    if (storedUser?.role === "user") {
+      navigate("/");
     }
   }, []);
-
-  const redirectToDashboard = (role) => {
-    switch (role) {
-      case "admin":
-        navigate("/admin-dashboard");
-        break;
-      case "agent":
-        navigate("/agent-dashboard");
-        break;
-      case "user":
-        navigate("/user-dashboard");
-        break;
-      default:
-        navigate("/home");
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,12 +25,9 @@ const Login = () => {
       return toast.error("Please provide both email and password");
     }
 
-    const isAdmin = email.endsWith("@admin.com");
-    const loginRoute = isAdmin ? `${server}/user/login-admin` : `${server}/user/login-user`;
-
     try {
       const response = await axios.post(
-        loginRoute,
+        `${server}/user/login-user`,
         { email, password },
         { withCredentials: true }
       );
@@ -56,10 +37,7 @@ const Login = () => {
         sessionStorage.setItem("token", token);
         sessionStorage.setItem("user", JSON.stringify(user));
         toast.success("Login Successful");
-
-        console.log("User role:", user.role); // Debugging
-
-        redirectToDashboard(user.role);
+        navigate("/home");
       } else {
         toast.error(response.data.message || "Login failed");
       }
@@ -124,24 +102,6 @@ const Login = () => {
                 />
               )}
             </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">Remember me</label>
-            </div>
-            <button
-              type="button"
-              onClick={() => navigate("/forgot-password")}
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              Forgot your password?
-            </button>
           </div>
           <button
             type="submit"

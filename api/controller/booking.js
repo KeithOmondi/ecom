@@ -3,17 +3,15 @@ const router = express.Router();
 const ErrorHandler = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const { isAuthenticated, isSeller, isAdmin, isAgent } = require("../middleware/auth");
-const Booking = require("../model/booking")
-const Property = require("../model/property")
+const Booking = require("../model/booking");
 
-// create new booking
+// Create new booking
 router.post(
   "/create-booking",
   catchAsyncErrors(async (req, res, next) => {
     try {
       const { cart, bookingAddress, user, totalPrice, paymentInfo } = req.body;
 
-      // Group cart items by propertyId
       const propertyItemsMap = new Map();
 
       for (const item of cart) {
@@ -24,7 +22,6 @@ router.post(
         propertyItemsMap.get(propertyId).push(item);
       }
 
-      // Create a booking for each property
       const bookings = [];
 
       for (const [propertyId, items] of propertyItemsMap) {
@@ -43,38 +40,34 @@ router.post(
         bookings,
       });
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+      next(new ErrorHandler(error.message, 500));
     }
   })
 );
 
-// get all bookings of user
+// Get all bookings of a user
 router.get(
   "/get-all-bookings/:userId",
   catchAsyncErrors(async (req, res, next) => {
     try {
-      const bookings = await Booking.find({ "user._id": req.params.userId }).sort({
-        createdAt: -1,
-      });
+      const bookings = await Booking.find({ "user._id": req.params.userId }).sort({ createdAt: -1 });
 
       res.status(200).json({
         success: true,
         bookings,
       });
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+      next(new ErrorHandler(error.message, 500));
     }
   })
 );
 
-// get all bookings of property owner
+// Get all bookings for a property
 router.get(
   "/get-property-all-bookings/:propertyId",
   catchAsyncErrors(async (req, res, next) => {
     try {
-      const bookings = await Booking.find({
-        "cart.propertyId": req.params.propertyId,
-      }).sort({
+      const bookings = await Booking.find({ "cart.propertyId": req.params.propertyId }).sort({
         createdAt: -1,
       });
 
@@ -83,12 +76,12 @@ router.get(
         bookings,
       });
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+      next(new ErrorHandler(error.message, 500));
     }
   })
 );
 
-// update booking status for property owner
+// Update booking status (for property owner/agent)
 router.put(
   "/update-booking-status/:id",
   isAgent,
@@ -97,7 +90,7 @@ router.put(
       const booking = await Booking.findById(req.params.id);
 
       if (!booking) {
-        return next(new ErrorHandler("Booking not found with this id", 400));
+        return next(new ErrorHandler("Booking not found with this ID", 404));
       }
 
       booking.status = req.body.status;
@@ -114,12 +107,12 @@ router.put(
         booking,
       });
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+      next(new ErrorHandler(error.message, 500));
     }
   })
 );
 
-// request a refund ---- user
+// Request a refund (user)
 router.put(
   "/booking-refund/:id",
   catchAsyncErrors(async (req, res, next) => {
@@ -127,25 +120,24 @@ router.put(
       const booking = await Booking.findById(req.params.id);
 
       if (!booking) {
-        return next(new ErrorHandler("Booking not found with this id", 400));
+        return next(new ErrorHandler("Booking not found with this ID", 404));
       }
 
       booking.status = req.body.status;
-
       await booking.save({ validateBeforeSave: false });
 
       res.status(200).json({
         success: true,
         booking,
-        message: "Booking Refund Request successfully!",
+        message: "Booking refund request submitted successfully!",
       });
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+      next(new ErrorHandler(error.message, 500));
     }
   })
 );
 
-// accept the refund ---- property owner
+// Approve refund (property owner/agent)
 router.put(
   "/booking-refund-success/:id",
   isAgent,
@@ -154,40 +146,37 @@ router.put(
       const booking = await Booking.findById(req.params.id);
 
       if (!booking) {
-        return next(new ErrorHandler("Booking not found with this id", 400));
+        return next(new ErrorHandler("Booking not found with this ID", 404));
       }
 
       booking.status = req.body.status;
-
       await booking.save();
 
       res.status(200).json({
         success: true,
-        message: "Booking Refund successful!",
+        message: "Booking refund approved successfully!",
       });
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+      next(new ErrorHandler(error.message, 500));
     }
   })
 );
 
-// all bookings --- for admin
+// Get all bookings (Admin)
 router.get(
   "/admin-all-bookings",
   isAuthenticated,
   isAdmin("Admin"),
   catchAsyncErrors(async (req, res, next) => {
     try {
-      const bookings = await Booking.find().sort({
-        confirmedAt: -1,
-        createdAt: -1,
-      });
-      res.status(201).json({
+      const bookings = await Booking.find().sort({ createdAt: -1 });
+
+      res.status(200).json({
         success: true,
         bookings,
       });
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+      next(new ErrorHandler(error.message, 500));
     }
   })
 );
